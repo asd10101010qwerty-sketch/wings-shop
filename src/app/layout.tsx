@@ -8,6 +8,7 @@ import { AuthProvider } from '@/lib/auth/context';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { CartDrawer } from '@/components/cart/CartDrawer';
+import { AiChatWidget } from '@/components/ai/AiChatWidget';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -90,6 +91,7 @@ export default function RootLayout({
                   {children}
                 </main>
                 <CartDrawer />
+                <AiChatWidget />
                 <Footer />
               </CartProvider>
             </AuthProvider>
