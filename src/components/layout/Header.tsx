@@ -118,7 +118,7 @@ export function Header() {
   return (
     <header ref={headerRef} className="sticky top-0 z-40 w-full flex flex-col border-b border-neutral-200 dark:border-[#20202e] bg-white/95 dark:bg-[#09090c]/95 backdrop-blur-md transition-colors duration-200">
       {/* Top Announcement Bar */}
-      <div className="w-full bg-neutral-100 dark:bg-[#0d0d12] text-neutral-600 dark:text-neutral-300 border-b border-neutral-200 dark:border-[#1b1b26] text-xs py-1.5 px-4 sm:px-8 lg:px-10 transition-colors duration-200">
+      <div className="w-full bg-neutral-100 dark:bg-[#0d0d12] text-neutral-600 dark:text-neutral-300 border-b border-neutral-200 dark:border-[#1b1b26] text-xs py-1.5 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -187,57 +187,59 @@ export function Header() {
       </div>
 
       {/* Main Header Bar */}
-      <div className="max-w-7xl mx-auto w-full px-4 sm:px-8 lg:px-10 py-3 flex items-center justify-between gap-2.5 xl:gap-4">
-        {/* Brand Logo */}
-        <div className="shrink-0">
-          <WingsLogo size="md" />
-        </div>
+      <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-2.5 xl:gap-4">
+        {/* Left Side: Brand Logo and Navigation Links closely grouped */}
+        <div className="flex items-center gap-3 xl:gap-4 2xl:gap-5 shrink-0">
+          <div className="shrink-0">
+            <WingsLogo size="md" />
+          </div>
 
-        {/* Desktop Navigation Links (shifted left closer to logo with clean compact spacing) */}
-        <nav className="hidden lg:flex items-center ml-2 xl:ml-4 gap-2.5 xl:gap-4 2xl:gap-6 text-xs xl:text-xs 2xl:text-sm font-semibold whitespace-nowrap shrink-0">
-          <Link
-            href="/"
-            className="text-neutral-600 dark:text-neutral-300 hover:text-rose-600 dark:hover:text-rose-400 transition-colors tracking-wide whitespace-nowrap shrink-0"
-          >
-            {t.nav.home}
-          </Link>
-          <Link
-            href="/products"
-            className="text-neutral-600 dark:text-neutral-300 hover:text-rose-600 dark:hover:text-rose-400 transition-colors tracking-wide whitespace-nowrap shrink-0"
-          >
-            {t.nav.products}
-          </Link>
-          <Link
-            href="/categories/audio"
-            className="text-neutral-600 dark:text-neutral-300 hover:text-rose-600 dark:hover:text-rose-400 transition-colors tracking-wide whitespace-nowrap shrink-0"
-          >
-            {locale === 'ru' ? 'Аудио' : locale === 'en' ? 'Audio' : 'Audio'}
-          </Link>
-          <Link
-            href="/categories/footwear"
-            className="text-neutral-600 dark:text-neutral-300 hover:text-rose-600 dark:hover:text-rose-400 transition-colors tracking-wide whitespace-nowrap shrink-0"
-          >
-            {locale === 'ru' ? 'Обувь' : locale === 'en' ? 'Footwear' : 'Poyabzal'}
-          </Link>
-          <Link
-            href="/categories/timepieces"
-            className="text-neutral-600 dark:text-neutral-300 hover:text-rose-600 dark:hover:text-rose-400 transition-colors tracking-wide whitespace-nowrap shrink-0"
-          >
-            {locale === 'ru' ? 'Часы' : locale === 'en' ? 'Timepieces' : 'Soatlar'}
-          </Link>
-          <Link
-            href="/about"
-            className="text-neutral-600 dark:text-neutral-300 hover:text-rose-600 dark:hover:text-rose-400 transition-colors tracking-wide whitespace-nowrap shrink-0"
-          >
-            {t.nav.about}
-          </Link>
-          <Link
-            href="/contact"
-            className="text-neutral-600 dark:text-neutral-300 hover:text-rose-600 dark:hover:text-rose-400 transition-colors tracking-wide whitespace-nowrap shrink-0"
-          >
-            {t.nav.contact}
-          </Link>
-        </nav>
+          {/* Desktop Navigation Links (shifted left directly adjacent to logo) */}
+          <nav className="hidden lg:flex items-center gap-2 xl:gap-3 2xl:gap-4 text-xs xl:text-xs 2xl:text-sm font-semibold whitespace-nowrap">
+            <Link
+              href="/"
+              className="text-neutral-600 dark:text-neutral-300 hover:text-rose-600 dark:hover:text-rose-400 transition-colors tracking-wide whitespace-nowrap"
+            >
+              {t.nav.home}
+            </Link>
+            <Link
+              href="/products"
+              className="text-neutral-600 dark:text-neutral-300 hover:text-rose-600 dark:hover:text-rose-400 transition-colors tracking-wide whitespace-nowrap"
+            >
+              {t.nav.products}
+            </Link>
+            <Link
+              href="/categories/audio"
+              className="text-neutral-600 dark:text-neutral-300 hover:text-rose-600 dark:hover:text-rose-400 transition-colors tracking-wide whitespace-nowrap"
+            >
+              {locale === 'ru' ? 'Аудио' : locale === 'en' ? 'Audio' : 'Audio'}
+            </Link>
+            <Link
+              href="/categories/footwear"
+              className="text-neutral-600 dark:text-neutral-300 hover:text-rose-600 dark:hover:text-rose-400 transition-colors tracking-wide whitespace-nowrap"
+            >
+              {locale === 'ru' ? 'Обувь' : locale === 'en' ? 'Footwear' : 'Poyabzal'}
+            </Link>
+            <Link
+              href="/categories/timepieces"
+              className="text-neutral-600 dark:text-neutral-300 hover:text-rose-600 dark:hover:text-rose-400 transition-colors tracking-wide whitespace-nowrap"
+            >
+              {locale === 'ru' ? 'Часы' : locale === 'en' ? 'Timepieces' : 'Soatlar'}
+            </Link>
+            <Link
+              href="/about"
+              className="text-neutral-600 dark:text-neutral-300 hover:text-rose-600 dark:hover:text-rose-400 transition-colors tracking-wide whitespace-nowrap"
+            >
+              {t.nav.about}
+            </Link>
+            <Link
+              href="/contact"
+              className="text-neutral-600 dark:text-neutral-300 hover:text-rose-600 dark:hover:text-rose-400 transition-colors tracking-wide whitespace-nowrap"
+            >
+              {t.nav.contact}
+            </Link>
+          </nav>
+        </div>
 
         {/* Desktop Search Trigger Bar */}
         <button
