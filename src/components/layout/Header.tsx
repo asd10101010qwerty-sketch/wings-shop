@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useI18n } from '@/lib/i18n/context';
@@ -38,15 +38,62 @@ export function Header() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
 
+  const headerRef = useRef<HTMLElement>(null);
+  const langMenuRef = useRef<HTMLDivElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
+  // Close menus on outside click or Escape key
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
+    function handleClickOutside(event: MouseEvent | TouchEvent) {
+      const target = event.target as Node;
+      if (langMenuOpen && langMenuRef.current && !langMenuRef.current.contains(target)) {
+        setLangMenuOpen(false);
+      }
+      if (userMenuOpen && userMenuRef.current && !userMenuRef.current.contains(target)) {
+        setUserMenuOpen(false);
+      }
+      if (mobileMenuOpen && headerRef.current && !headerRef.current.contains(target)) {
+        setMobileMenuOpen(false);
+      }
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setLangMenuOpen(false);
+        setUserMenuOpen(false);
+        setMobileMenuOpen(false);
+      }
+    }
+
+    if (langMenuOpen || userMenuOpen || mobileMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
+    }
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [langMenuOpen, userMenuOpen, mobileMenuOpen]);
+
+  // Close all open dropdowns/menus whenever the route changes
+  useEffect(() => {
+    setLangMenuOpen(false);
+    setUserMenuOpen(false);
+    setMobileMenuOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    const handleShortcut = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         setIsSearchModalOpen((prev) => !prev);
       }
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('keydown', handleShortcut);
+    return () => window.removeEventListener('keydown', handleShortcut);
   }, []);
 
   // Do not render storefront header inside the admin panel
@@ -69,7 +116,7 @@ export function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-40 w-full flex flex-col border-b border-neutral-200 dark:border-[#20202e] bg-white/95 dark:bg-[#09090c]/95 backdrop-blur-md transition-colors duration-200">
+    <header ref={headerRef} className="sticky top-0 z-40 w-full flex flex-col border-b border-neutral-200 dark:border-[#20202e] bg-white/95 dark:bg-[#09090c]/95 backdrop-blur-md transition-colors duration-200">
       {/* Top Announcement Bar */}
       <div className="w-full bg-neutral-100 dark:bg-[#0d0d12] text-neutral-600 dark:text-neutral-300 border-b border-neutral-200 dark:border-[#1b1b26] text-xs py-1.5 px-4 sm:px-8 transition-colors duration-200">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -97,25 +144,32 @@ export function Header() {
             </a>
 
             {/* Language Selector */}
-            <div className="relative">
+            <div className="relative" ref={langMenuRef}>
               <button
-                onClick={() => setLangMenuOpen(!langMenuOpen)}
-                className="flex items-center gap-1.5 text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white transition-colors py-0.5 px-2 rounded hover:bg-neutral-200/70 dark:hover:bg-[#1a1a24] text-xs font-semibold"
+                type="button"
+                onClick={() => {
+                  setLangMenuOpen((prev) => !prev);
+                  setUserMenuOpen(false);
+                }}
+                aria-expanded={langMenuOpen}
+                aria-haspopup="true"
+                className="flex items-center gap-1.5 text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white transition-colors py-0.5 px-2 rounded hover:bg-neutral-200/70 dark:hover:bg-[#1a1a24] text-xs font-semibold cursor-pointer select-none"
               >
                 <Globe size={13} className="text-rose-500" />
                 <span className="uppercase tracking-wider">{locale}</span>
               </button>
 
               {langMenuOpen && (
-                <div className="absolute right-0 mt-1.5 w-36 bg-white dark:bg-[#14141e] border border-neutral-200 dark:border-[#2a2a3c] rounded-lg shadow-2xl py-1 z-50">
+                <div className="absolute right-0 mt-1.5 w-36 bg-white dark:bg-[#14141e] border border-neutral-200 dark:border-[#2a2a3c] rounded-lg shadow-2xl py-1 z-50 animate-in fade-in zoom-in-95 duration-100">
                   {languages.map((lang) => (
                     <button
                       key={lang.code}
+                      type="button"
                       onClick={() => {
                         setLocale(lang.code);
                         setLangMenuOpen(false);
                       }}
-                      className={`w-full text-left px-3 py-1.5 text-xs flex items-center justify-between hover:bg-neutral-100 dark:hover:bg-[#1f1f2e] transition-colors ${
+                      className={`w-full text-left px-3 py-1.5 text-xs flex items-center justify-between hover:bg-neutral-100 dark:hover:bg-[#1f1f2e] transition-colors cursor-pointer select-none ${
                         locale === lang.code
                           ? 'text-rose-600 dark:text-rose-400 font-bold bg-neutral-100 dark:bg-[#1a1a28]'
                           : 'text-neutral-700 dark:text-neutral-300'
@@ -258,17 +312,23 @@ export function Header() {
           <ThemeToggle />
 
           {/* User Account Dropdown */}
-          <div className="relative">
+          <div className="relative" ref={userMenuRef}>
             <button
-              onClick={() => setUserMenuOpen(!userMenuOpen)}
-              className="p-2 text-neutral-600 dark:text-neutral-300 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-neutral-100 dark:hover:bg-[#171722] rounded-full transition-all"
+              type="button"
+              onClick={() => {
+                setUserMenuOpen((prev) => !prev);
+                setLangMenuOpen(false);
+              }}
+              aria-expanded={userMenuOpen}
+              aria-haspopup="true"
+              className="p-2 text-neutral-600 dark:text-neutral-300 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-neutral-100 dark:hover:bg-[#171722] rounded-full transition-all cursor-pointer select-none"
               title={t.nav.account}
             >
               <User size={19} />
             </button>
 
             {userMenuOpen && (
-              <div className="absolute right-0 mt-2 w-60 bg-white dark:bg-[#13131c] border border-neutral-200 dark:border-[#242436] rounded-xl shadow-2xl py-2 z-50 divide-y divide-neutral-100 dark:divide-[#202030]">
+              <div className="absolute right-0 mt-2 w-60 bg-white dark:bg-[#13131c] border border-neutral-200 dark:border-[#242436] rounded-xl shadow-2xl py-2 z-50 divide-y divide-neutral-100 dark:divide-[#202030] animate-in fade-in zoom-in-95 duration-100">
                 <div className="px-3.5 py-2">
                   <p className="text-[11px] text-neutral-500 dark:text-neutral-400">Hisob</p>
                   <p className="text-xs font-bold text-neutral-900 dark:text-white truncate">
@@ -319,11 +379,12 @@ export function Header() {
                 <div className="py-1">
                   {user ? (
                     <button
+                      type="button"
                       onClick={() => {
                         signOut();
                         setUserMenuOpen(false);
                       }}
-                      className="w-full text-left flex items-center gap-2 px-3.5 py-2 text-xs text-neutral-500 dark:text-neutral-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-neutral-100 dark:hover:bg-[#1c1c2a] transition-colors"
+                      className="w-full text-left flex items-center gap-2 px-3.5 py-2 text-xs text-neutral-500 dark:text-neutral-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-neutral-100 dark:hover:bg-[#1c1c2a] transition-colors cursor-pointer select-none"
                     >
                       <LogOut size={15} />
                       <span>{t.nav.logout}</span>
@@ -355,8 +416,10 @@ export function Header() {
 
           {/* Mobile Menu Button */}
           <button
+            type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white transition-colors"
+            className="lg:hidden p-2 text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white transition-colors cursor-pointer"
+            aria-label="Menyu"
           >
             {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
@@ -365,21 +428,49 @@ export function Header() {
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden w-full bg-white dark:bg-[#0d0d14] border-b border-neutral-200 dark:border-[#20202e] px-5 py-4 flex flex-col gap-4 shadow-xl">
+        <div className="lg:hidden w-full bg-white dark:bg-[#0d0d14] border-b border-neutral-200 dark:border-[#20202e] px-5 py-4 flex flex-col gap-4 shadow-xl animate-in slide-in-from-top-2 duration-150">
           <button
             type="button"
             onClick={() => {
               setMobileMenuOpen(false);
               setIsSearchModalOpen(true);
             }}
-            className="relative w-full flex items-center bg-neutral-100 dark:bg-[#14141e] text-xs text-neutral-500 dark:text-neutral-400 rounded-lg pl-9 pr-3 py-2.5 border border-neutral-200 dark:border-[#28283a] text-left"
+            className="relative w-full flex items-center bg-neutral-100 dark:bg-[#14141e] text-xs text-neutral-500 dark:text-neutral-400 rounded-lg pl-9 pr-3 py-2.5 border border-neutral-200 dark:border-[#28283a] text-left cursor-pointer"
           >
             <Search size={15} className="absolute left-3 text-neutral-400" />
             <span>{t.common.search_placeholder}</span>
           </button>
 
-          {/* Mobile Theme Switcher */}
-          <ThemeToggle variant="mobile" />
+          {/* Mobile Controls (Theme and Language) */}
+          <div className="flex flex-col gap-2">
+            <ThemeToggle variant="mobile" />
+
+            <div className="flex items-center justify-between px-3.5 py-2 rounded-xl bg-neutral-100 dark:bg-[#14141e] border border-neutral-200 dark:border-[#28283a] text-xs font-semibold">
+              <span className="flex items-center gap-2 text-neutral-700 dark:text-neutral-300">
+                <Globe size={15} className="text-rose-500" />
+                <span>{locale === 'ru' ? 'Язык сайта' : locale === 'en' ? 'Language' : 'Sayt tili'}</span>
+              </span>
+              <div className="flex items-center gap-1">
+                {languages.map((l) => (
+                  <button
+                    key={l.code}
+                    type="button"
+                    onClick={() => {
+                      setLocale(l.code);
+                      setMobileMenuOpen(false);
+                    }}
+                    className={`px-2 py-1 rounded-md text-xs font-bold transition-all cursor-pointer ${
+                      locale === l.code
+                        ? 'bg-rose-600 text-white shadow-xs'
+                        : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
+                    }`}
+                  >
+                    {l.flag} {l.code.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
 
           <nav className="flex flex-col gap-2 text-sm font-medium">
             <Link
