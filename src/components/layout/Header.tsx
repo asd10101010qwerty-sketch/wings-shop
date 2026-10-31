@@ -118,7 +118,7 @@ export function Header() {
   return (
     <header ref={headerRef} className="sticky top-0 z-40 w-full flex flex-col border-b border-neutral-200 dark:border-[#20202e] bg-white/95 dark:bg-[#09090c]/95 backdrop-blur-md transition-colors duration-200">
       {/* Top Announcement Bar */}
-      <div className="w-full bg-neutral-100 dark:bg-[#0d0d12] text-neutral-600 dark:text-neutral-300 border-b border-neutral-200 dark:border-[#1b1b26] text-xs py-1.5 px-4 sm:px-8 transition-colors duration-200">
+      <div className="w-full bg-neutral-100 dark:bg-[#0d0d12] text-neutral-600 dark:text-neutral-300 border-b border-neutral-200 dark:border-[#1b1b26] text-xs py-1.5 px-4 sm:px-8 lg:px-10 transition-colors duration-200">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -187,14 +187,14 @@ export function Header() {
       </div>
 
       {/* Main Header Bar */}
-      <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between gap-3 sm:gap-4 xl:gap-6">
+      <div className="max-w-7xl mx-auto w-full px-4 sm:px-8 lg:px-10 py-3 flex items-center justify-between gap-2.5 xl:gap-4">
         {/* Brand Logo */}
         <div className="shrink-0">
           <WingsLogo size="md" />
         </div>
 
-        {/* Desktop Navigation Links */}
-        <nav className="hidden lg:flex items-center gap-3 xl:gap-5 2xl:gap-6 text-xs xl:text-sm font-semibold whitespace-nowrap shrink-0">
+        {/* Desktop Navigation Links (shifted left closer to logo with clean compact spacing) */}
+        <nav className="hidden lg:flex items-center ml-2 xl:ml-4 gap-2.5 xl:gap-4 2xl:gap-6 text-xs xl:text-xs 2xl:text-sm font-semibold whitespace-nowrap shrink-0">
           <Link
             href="/"
             className="text-neutral-600 dark:text-neutral-300 hover:text-rose-600 dark:hover:text-rose-400 transition-colors tracking-wide whitespace-nowrap shrink-0"
@@ -243,21 +243,21 @@ export function Header() {
         <button
           type="button"
           onClick={() => setIsSearchModalOpen(true)}
-          className="hidden xl:flex relative items-center w-40 2xl:w-60 ml-auto bg-neutral-100 dark:bg-[#13131c] text-xs text-neutral-400 dark:text-neutral-500 rounded-full pl-8 pr-2 py-1.5 border border-neutral-200 dark:border-[#242434] hover:border-rose-500/60 dark:hover:border-rose-500/60 hover:text-neutral-600 dark:hover:text-neutral-300 transition-all text-left group shadow-xs cursor-pointer shrink-0"
+          className="hidden xl:flex relative items-center w-36 2xl:w-56 ml-auto bg-neutral-100 dark:bg-[#13131c] text-xs text-neutral-400 dark:text-neutral-500 rounded-full pl-7 pr-2 py-1.5 border border-neutral-200 dark:border-[#242434] hover:border-rose-500/60 dark:hover:border-rose-500/60 hover:text-neutral-600 dark:hover:text-neutral-300 transition-all text-left group shadow-xs cursor-pointer shrink-0"
         >
           <Search size={13} className="absolute left-2.5 text-neutral-400 group-hover:text-rose-500 transition-colors" />
-          <span className="truncate pr-1 text-[11px] 2xl:text-xs">{t.common.search_placeholder}</span>
+          <span className="truncate pr-1 text-[11px] 2xl:text-xs max-w-[90px] 2xl:max-w-none">{t.common.search_placeholder}</span>
           <span className="ml-auto inline-flex items-center gap-0.5 px-1 py-0.5 rounded text-[9px] font-mono font-bold bg-white dark:bg-[#1f1f2e] text-neutral-500 dark:text-neutral-400 border border-neutral-300 dark:border-[#2e2e42] shrink-0">
             ⌘K
           </span>
         </button>
 
         {/* Action Icons */}
-        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
           {/* Quick Search Button (visible on mobile and tablet below xl) */}
           <button
             onClick={() => setIsSearchModalOpen(true)}
-            className="xl:hidden p-2 text-neutral-600 dark:text-neutral-300 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-neutral-100 dark:hover:bg-[#171722] rounded-full transition-all"
+            className="xl:hidden p-2 text-neutral-600 dark:text-neutral-300 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-neutral-100 dark:hover:bg-[#171722] rounded-full transition-all cursor-pointer"
             title={`${t.nav.search} (Ctrl+K)`}
             aria-label={t.nav.search}
           >
@@ -266,7 +266,7 @@ export function Header() {
           {/* Wishlist Icon */}
           <Link
             href="/wishlist"
-            className="relative p-2 text-neutral-600 dark:text-neutral-300 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-neutral-100 dark:hover:bg-[#171722] rounded-full transition-all"
+            className="relative p-2 text-neutral-600 dark:text-neutral-300 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-neutral-100 dark:hover:bg-[#171722] rounded-full transition-all cursor-pointer"
             title={t.nav.wishlist}
           >
             <Heart size={18} />
@@ -280,7 +280,7 @@ export function Header() {
           {/* Cart Icon / Drawer Toggle */}
           <button
             onClick={() => setIsCartDrawerOpen(true)}
-            className="relative flex items-center gap-1.5 py-1.5 px-2.5 sm:px-3 bg-neutral-100 dark:bg-[#13131c] hover:bg-neutral-200/70 dark:hover:bg-[#1a1a26] border border-neutral-200 dark:border-[#242434] hover:border-rose-500/40 rounded-full transition-all group shrink-0"
+            className="relative flex items-center gap-1.5 py-1.5 px-2 sm:px-2.5 2xl:px-3 bg-neutral-100 dark:bg-[#13131c] hover:bg-neutral-200/70 dark:hover:bg-[#1a1a26] border border-neutral-200 dark:border-[#242434] hover:border-rose-500/40 rounded-full transition-all group shrink-0 cursor-pointer"
             title={t.nav.cart}
           >
             <div className="relative">
@@ -300,10 +300,10 @@ export function Header() {
           {isAdmin && (
             <Link
               href="/admin"
-              className="hidden md:flex items-center gap-1 px-2 py-1.5 2xl:px-2.5 rounded-full bg-rose-50 dark:bg-rose-950/70 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs font-bold hover:bg-rose-100 dark:hover:bg-rose-900/80 transition-colors shrink-0 shadow-xs"
+              className="hidden md:flex items-center gap-1 p-2 2xl:px-2.5 2xl:py-1.5 rounded-full bg-rose-50 dark:bg-rose-950/70 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs font-bold hover:bg-rose-100 dark:hover:bg-rose-900/80 transition-colors shrink-0 shadow-xs"
               title="Admin Panel"
             >
-              <ShieldCheck size={14} />
+              <ShieldCheck size={15} />
               <span className="hidden 2xl:inline">Admin</span>
             </Link>
           )}
