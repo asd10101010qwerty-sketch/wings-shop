@@ -74,7 +74,12 @@ export async function POST(req: NextRequest) {
       parts: [{ text: message }],
     });
 
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${GEMINI_API_KEY}`;
+    const models = [
+      'gemini-3.8-flash',
+      'gemini-2.5-flash',
+      'gemini-2.0-flash',
+      'gemini-1.5-flash',
+    ];
 
     const payload = {
       system_instruction: {
@@ -91,36 +96,46 @@ export async function POST(req: NextRequest) {
       },
     };
 
-    const res = await fetch(apiUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
+    let replyText = '';
+    let lastError = null;
 
-    if (!res.ok) {
-      const errText = await res.text();
-      console.error('[Gemini API Error]:', res.status, errText);
+    for (const model of models) {
+      try {
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+        const res = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
 
-      // Graceful fallback response if API quota or issue arises
+        if (res.ok) {
+          const data = await res.json();
+          const candidate = data.candidates?.[0];
+          const text = candidate?.content?.parts?.[0]?.text;
+          if (text) {
+            replyText = text;
+            break; // Success!
+          }
+        } else {
+          lastError = await res.text();
+          console.warn(`[Gemini Model ${model} Warning]:`, res.status);
+        }
+      } catch (err: any) {
+        lastError = err.message;
+      }
+    }
+
+    if (!replyText) {
+      console.error('[Gemini API Final Fallback]:', lastError);
       return NextResponse.json({
         reply:
           locale === 'ru'
-            ? 'Извините, в данный момент сервер ИИ перегружен. Вы можете изучить товары в каталоге или написать нашему боту в Telegram: @wings_shop_bot'
+            ? 'Извините, в данный момент сервер ИИ кратковременно перегружен. Вы можете изучить товары в каталоге или написать нашему боту в Telegram: @wings_shop_bot'
             : locale === 'en'
-            ? 'Sorry, our AI stylist is momentarily unavailable. Please check our catalogue or contact our Telegram support: @wings_shop_bot'
+            ? 'Sorry, our AI stylist is momentarily busy. Please explore our catalogue or contact our Telegram support: @wings_shop_bot'
             : 'Kechirasiz, ayni paytda AI serverida qisqa tanaffus. Mahsulotlarimizni /products katalogida koʻrishingiz yoki Telegram botimizga yozishingiz mumkin: @wings_shop_bot',
       });
     }
-
-    const data = await res.json();
-    const candidate = data.candidates?.[0];
-    const replyText =
-      candidate?.content?.parts?.[0]?.text ||
-      (locale === 'ru'
-        ? 'Чем я могу вам помочь по каталогу Wings?'
-        : locale === 'en'
-        ? 'How may I assist you with the Wings catalogue?'
-        : 'Wings mahsulotlari boʻyicha sizga qanday yordam bera olaman?');
 
     return NextResponse.json({
       reply: replyText,
