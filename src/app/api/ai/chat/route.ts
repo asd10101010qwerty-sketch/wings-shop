@@ -74,11 +74,12 @@ export async function POST(req: NextRequest) {
       parts: [{ text: message }],
     });
 
+    // Prioritize ultrafast lightweight models for sub-second response times
     const models = [
+      'gemini-flash-lite-latest',
+      'gemini-3.1-flash-lite',
+      'gemini-flash-latest',
       'gemini-3.8-flash',
-      'gemini-2.5-flash',
-      'gemini-2.0-flash',
-      'gemini-1.5-flash',
     ];
 
     const payload = {
@@ -92,7 +93,7 @@ export async function POST(req: NextRequest) {
       contents,
       generationConfig: {
         temperature: 0.7,
-        maxOutputTokens: 1024,
+        maxOutputTokens: 600,
       },
     };
 
@@ -102,10 +103,12 @@ export async function POST(req: NextRequest) {
     for (const model of models) {
       try {
         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+        // Abort if any model takes over 5 seconds to guarantee lightning-fast replies
         const res = await fetch(apiUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
+          signal: AbortSignal.timeout(5000),
         });
 
         if (res.ok) {
@@ -114,7 +117,7 @@ export async function POST(req: NextRequest) {
           const text = candidate?.content?.parts?.[0]?.text;
           if (text) {
             replyText = text;
-            break; // Success!
+            break; // Fast success!
           }
         } else {
           lastError = await res.text();
